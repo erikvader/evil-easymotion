@@ -152,14 +152,18 @@
 
                 (narrow-to-region (max beg (window-start))
                                   (min end (window-end))))
-              (while (and (ignore-errors
-                            (setq this-command func
-                                  last-command func)
-                            (call-interactively func)
-                            t)
-                          (setq point (cons (point) (get-buffer-window)))
-                          (not (member point points))
-                          (push point points))))))
+              ;; run the commands in normal state, so that special
+              ;; behaviours doesn't trigger
+              ;; (eg. `evil-forward-word-end')
+              (let ((evil-state 'normal))
+                (while (and (ignore-errors
+                              (setq this-command func
+                                    last-command func)
+                              (call-interactively func)
+                              t)
+                            (setq point (cons (point) (get-buffer-window)))
+                            (not (member point points))
+                            (push point points)))))))
       (setq points (cl-remove-duplicates
                     (cl-mapcan (lambda (f)
                                  (evilem--collect f scope all-windows))
