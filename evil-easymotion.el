@@ -152,18 +152,15 @@
 
                 (narrow-to-region (max beg (window-start))
                                   (min end (window-end))))
-              ;; run the commands in normal state, so that special
-              ;; behaviours doesn't trigger
-              ;; (eg. `evil-forward-word-end')
-              (let ((evil-state 'normal))
-                (while (and (ignore-errors
-                              (setq this-command func
-                                    last-command func)
-                              (call-interactively func)
-                              t)
-                            (setq point (cons (point) (get-buffer-window)))
-                            (not (member point points))
-                            (push point points)))))))
+
+              (while (and (ignore-errors
+                            (setq this-command func
+                                  last-command func)
+                            (call-interactively func)
+                            t)
+                          (setq point (cons (point) (get-buffer-window)))
+                          (not (member point points))
+                          (push point points))))))
       (setq points (cl-remove-duplicates
                     (cl-mapcan (lambda (f)
                                  (evilem--collect f scope all-windows))
@@ -316,6 +313,24 @@
                     :push-jump ,push-jump
                     :collect-postprocess ,collect-postprocess)))
 
+;; modified functions from evil
+
+;; Evil special behaviour: e or E on a one-character word in
+;; operator state does not move point
+(evil-define-motion evilem-forward-word-end (count &optional bigword)
+  "Move the cursor to the end of the COUNT-th next word.
+If BIGWORD is non-nil, move by WORDS."
+  :type inclusive
+  (let ((thing (if bigword 'evil-WORD 'evil-word))
+        (count (or count 1)))
+    (evil-signal-at-bob-or-eob count)
+    (evil-forward-end thing count)))
+
+(evil-define-motion evilem-forward-WORD-end (count)
+  "Move the cursor to the beginning of the COUNT-th next WORD."
+  :type inclusive
+  (evilem-forward-word-end count t))
+
 ;;;###autoload (autoload 'evilem-motion-forward-word-begin "evil-easymotion" nil t)
 (evilem-make-motion
  evilem-motion-forward-word-begin #'evil-forward-word-begin
@@ -328,12 +343,12 @@
 
 ;;;###autoload (autoload 'evilem-motion-forward-word-end "evil-easymotion" nil t)
 (evilem-make-motion
- evilem-motion-forward-word-end #'evil-forward-word-end
+ evilem-motion-forward-word-end #'evilem-forward-word-end
  :scope 'line)
 
 ;;;###autoload (autoload 'evilem-motion-forward-WORD-end "evil-easymotion" nil t)
 (evilem-make-motion
- evilem-motion-forward-WORD-end #'evil-forward-WORD-end
+ evilem-motion-forward-WORD-end #'evilem-forward-WORD-end
  :scope 'line)
 
 ;;;###autoload (autoload 'evilem-motion-backward-word-begin "evil-easymotion" nil t)
