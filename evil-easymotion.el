@@ -431,6 +431,38 @@ If BIGWORD is non-nil, move by WORDS."
              (call-interactively #'evil-find-char-backward))
  :bind ((evil-cross-lines t)))
 
+;;;###autoload (autoload 'evilem-motion-find-char-to-inline "evil-easymotion" nil t)
+(evilem-make-motion
+ evilem-motion-find-char-to-inline #'evil-repeat-find-char
+ :pre-hook (save-excursion
+             (setq evil-this-type 'inclusive)
+             (call-interactively #'evil-find-char-to))
+ :bind ((evil-cross-lines nil)))
+
+;;;###autoload (autoload 'evilem-motion-find-char-to-backward-inline "evil-easymotion" nil t)
+(evilem-make-motion
+ evilem-motion-find-char-to-backward-inline #'evil-repeat-find-char
+ :pre-hook (save-excursion
+             (setq evil-this-type 'exclusive)
+             (call-interactively #'evil-find-char-to-backward))
+ :bind ((evil-cross-lines nil)))
+
+;;;###autoload (autoload 'evilem-motion-find-char-inline "evil-easymotion" nil t)
+(evilem-make-motion
+ evilem-motion-find-char-inline #'evil-repeat-find-char
+ :pre-hook (save-excursion
+             (setq evil-this-type 'inclusive)
+             (call-interactively #'evil-find-char))
+ :bind ((evil-cross-lines nil)))
+
+;;;###autoload (autoload 'evilem-motion-find-char-backward-inline "evil-easymotion" nil t)
+(evilem-make-motion
+ evilem-motion-find-char-backward-inline #'evil-repeat-find-char
+ :pre-hook (save-excursion
+             (setq evil-this-type 'exclusive)
+             (call-interactively #'evil-find-char-backward))
+ :bind ((evil-cross-lines nil)))
+
 ;;;###autoload (autoload 'evilem-motion-backward-section-begin "evil-easymotion" nil t)
 (evilem-make-motion
  evilem-motion-backward-section-begin #'evil-backward-section-begin
